@@ -1,6 +1,6 @@
 {
   "name": "dev-plugin",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Personal Claude Code plugin - dev workflow skills (session, GitHub flow, coding helpers)",
   "author": {
     "name": "Sinminbeom"

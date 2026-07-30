@@ -27,7 +27,14 @@ claude plugin install dev-plugin@sinminbeom
 
 | Hook | 스크립트 | 설명 |
 |------|----------|------|
+| `SessionStart` | `scripts/inject-rules.sh` | `rules/*.md`를 `~/.claude/rules/dev-plugin-*.md`로 symlink 주입 (매 세션 재생성) |
 | `PreToolUse` (Bash) | `scripts/block-main-commit.sh` | `main`/`master`/`develop`(통합 브랜치)에서 `git commit`/`git push` 직접 실행 차단. 태그 push(`refs/tags/`, `v*` 태그)는 허용 |
+
+## Rules
+
+| 문서 | 설명 |
+|------|------|
+| `rules/python.md` | Python 코딩 컨벤션 — SOLID, 클래스 래핑, 다중상속 정책, 타입 네이밍(`I`/`ab` prefix), 주석·docstring(WHY만) |
 
 ## 구조
 
@@ -38,6 +45,8 @@ dev-plugin/
 │   └── marketplace.json   # 마켓플레이스 정의 (repo = 마켓플레이스 + 플러그인 겸용)
 ├── hooks/
 │   └── hooks.json         # hook 정의
+├── rules/
+│   └── <rule>.md          # 세션에 주입되는 컨벤션 문서
 ├── scripts/
 │   └── <script>.sh        # hook 스크립트
 └── skills/                # 스킬 정의 (skills/<skill-name>/SKILL.md)

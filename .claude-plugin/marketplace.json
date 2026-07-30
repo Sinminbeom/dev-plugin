@@ -1,0 +1,14 @@
+{
+  "name": "sinminbeom",
+  "owner": {
+    "name": "Sinminbeom"
+  },
+  "plugins": [
+    {
+      "name": "dev-plugin",
+      "source": "./",
+      "description": "Personal Claude Code plugin - dev workflow skills (session, GitHub flow, coding helpers)",
+      "version": "0.2.0"
+    }
+  ]
+}

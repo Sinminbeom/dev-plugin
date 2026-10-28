@@ -34,7 +34,7 @@ claude plugin install dev-plugin@sinminbeom
 
 | 문서 | 설명 |
 |------|------|
-| `rules/python.md` | Python 코딩 컨벤션 — SOLID, 클래스 래핑, 다중상속 정책, 타입 네이밍(`I`/`ab` prefix), 주석·docstring(WHY만) |
+| `rules/python.md` | Python 코딩 컨벤션 — SOLID, 클래스 래핑, 인터페이스(ABC 통일·`Protocol` 예외), 다중상속 정책, 타입 네이밍(`I`/`ab` prefix), 주석·docstring(WHY만) |
 
 ## 구조
 

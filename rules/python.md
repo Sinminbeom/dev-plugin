@@ -13,10 +13,22 @@ SOLID 원칙을 기본으로 한다.
 - 클래스 종속 **상수/정책값**은 모듈 전역이 아니라 그 클래스의 클래스 상수로 둔다 (예: `GroupService.MAX_GROUP_DEPTH`)
   - 고정 정책값은 config/env로 빼지 않는다. 런타임·환경별로 달라져야 할 때만 설정으로 외부화한다
 
+## 인터페이스
+
+- 인터페이스는 `ABC` + `@abstractmethod`로 선언한다 — 구현 누락이 인스턴스화 시점에 `TypeError`로 드러나고, 구현 관계가 선언(`class S3Storage(IStorage)`)에 명시된다
+- 인터페이스(`I~`)는 구현이 둘 이상일 때(테스트 fake 포함)만 분리한다
+- Service·도메인 계층 시그니처에 외부 라이브러리 타입을 노출하지 않는다. 외부 타입은 어댑터 계층(`~Client`, DB는 `~Repository`)에서만 다룬다. 구현체가 항상 우리 코드이므로 `Protocol`의 구조적 타이핑이 필요 없다
+  - 대상: 외부 I/O 클라이언트(AWS SDK, HTTP·DB 드라이버, SQLAlchemy `Session`·`Engine`, `sqlite3`·`smtplib` 등 표준 라이브러리 I/O 클라이언트)
+  - 제외: 표준 라이브러리 값 타입(`Path`, `datetime` 등)과 스트림 타입(`IO[bytes]` 등), 프레임워크의 데이터 모델(pydantic 모델, SQLAlchemy ORM 모델 등)
+- 예외: 아래 경우만 `Protocol`을 허용한다
+  - `Callable[...]`로 표현할 수 없는 콜백 시그니처(키워드 인자·오버로드) — `__call__`을 가진 `Protocol`
+  - 구현체가 `ABCMeta`와 호환되지 않는 metaclass를 가진 타입(SQLAlchemy ORM 모델, `Enum` 등) — 구현체는 `Protocol`을 상속하지 않고 구조적으로만 만족시킨다. `Protocol`의 metaclass도 `ABCMeta` 하위라 상속하면 같은 충돌이 난다
+    - 계약 위반은 타입 대입으로 정적 검사한다 (`_: IColored = Color.RED`)
+
 ## 다중상속 정책
 
-- 상태(state)를 가진 일반 클래스의 다중상속 **금지** — 메서드가 어느 부모 구현으로 해석되는지 선언 위치에서 보이지 않아(MRO가 결정론적이어도 코드에 드러나지 않음) 리뷰·디버깅 비용이 비대칭적으로 증가한다. "한 파일을 열었을 때 그 동작을 예측할 수 있어야 한다"
-- 인터페이스(`Protocol`/`ABC`) 다중상속은 **허용** — 구현/상태가 없으므로 가시성 문제가 없다
+- 구현·상태를 가진 부모(일반 클래스, `ab~`)는 **하나만** 상속한다 — 메서드가 어느 부모 구현으로 해석되는지 선언 위치에서 보이지 않아(MRO가 결정론적이어도 코드에 드러나지 않음) 리뷰·디버깅 비용이 비대칭적으로 증가한다. "한 파일을 열었을 때 그 동작을 예측할 수 있어야 한다"
+- 인터페이스(`I~`)는 개수 제한 없이 함께 상속할 수 있다 (예: `S3Storage(abStorage, IHealthCheck)`) — 구현/상태가 없으므로 가시성 문제가 없다
 
 ## 타입 네이밍
 
@@ -25,12 +37,11 @@ SOLID 원칙을 기본으로 한다.
 | 카테고리 | 표기 | 예시 |
 | --- | --- | --- |
 | 일반 클래스 | `PascalCase` | `UserRepository` |
-| 인터페이스 (`Protocol`·순수 계약 `ABC`) | `I` + PascalCase | `IUserRepository` |
+| 인터페이스 (순수 계약 `ABC`) | `I` + PascalCase | `IUserRepository` |
 | 추상 클래스 (부분 구현 `ABC`, 상속 전제) | `ab`(소문자) + PascalCase | `abUserRepository` |
 | 상수 | `UPPER_SNAKE_CASE` | `MAX_RETRY_COUNT` |
 
 - 구현체는 접두사 없이 구체적인 이름을 쓴다 (`IStorage` / `abStorage` ← `S3Storage`)
-- 구체 구현이 하나뿐이거나 단순 데이터 홀더(`dataclass` 등)는 추상화가 아니므로 접두사를 붙이지 않는다
 - prefix 대소문자가 비대칭인 이유: 단일 문자 `I`는 PascalCase에 자연스럽게 녹아들지만, 다중 문자 `ab`는 소문자로 두어야 prefix임이 시각적으로 명확하다
 
 ## 주석·docstring

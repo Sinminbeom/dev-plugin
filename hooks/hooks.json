@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/block-main-commit.sh",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pretooluse-bash.sh",
             "timeout": 3
           }
         ]
